@@ -4,11 +4,13 @@ nl = 4;              % number of labels
 nn = [ 1:18 ] / 10;  % nn_params
 X = cos([1 2 ; 3 4 ; 5 6]);
 y = [4; 2; 3];
-
 lambda = 4;
 
+m = size(X, 1)
+y_matrix = eye(nl)(y, :);
 Theta1 = reshape(nn(1:hl * (il+ 1)), hl, (il + 1));
 Theta2 = reshape(nn((1 + (hl * (il + 1))):end), nl, (hl+ 1));
+
 
 % Test Case with Regularization
 [J grad] = nnCostFunction(nn, il, hl, nl, X, y, lambda)
@@ -36,7 +38,7 @@ Theta2 = reshape(nn((1 + (hl * (il + 1))):end), nl, (hl+ 1));
 
 
 % Test Case without Regularization
-[J grad] = nnCostFunction(nn, il, hl, nl, X, y, 0)
+[J grad] = nnCostFunction(nn, il, hl, nl, X, y, 0);
 
 % J =  7.4070
 % grad =

@@ -14,8 +14,8 @@ function [J grad] = nnCostFunction(nn_params, ...
 %   partial derivatives of the neural network.
 %
 
-% Reshape nn_params back into the parameters Theta1 and Theta2, the weight matrices
-% for our 2 layer neural network
+% Reshape nn_params back into the parameters Theta1 and Theta2, the weight
+% matrices for our 2 layer neural network
 Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
                  hidden_layer_size, (input_layer_size + 1));
 
@@ -70,9 +70,15 @@ a3 = sigmoid(z3);
 a3 = a3';
 
 % Now we can compute the cost function using a3, y_matrix, and m.
-% J(θ)= sum(sum(−y(i)log((hθ(x(i)))k)−(1−y(i))log(1−(hθ(x(i)))k)))
- 
+
+% Unregularized cost
 J = (1/m) * sum(sum((-y_matrix .* log(a3)) - ((1 - y_matrix) .* log(1 - a3))));
+
+% Regularized cost - excluding the first two columns for the bias units
+J = J + (lambda / (2 * m)) * (
+  sum(sum(Theta1(:, 2:end).^2)) +
+  sum(sum(Theta2(:, 2:end).^2))
+);
 
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial
@@ -90,6 +96,27 @@ J = (1/m) * sum(sum((-y_matrix .* log(a3)) - ((1 - y_matrix) .* log(1 - a3))));
 %               over the training examples if you are implementing it for the
 %               first time.
 %
+
+% m = the number of training examples
+% n = the number of training features, including the initial bias unit.
+% h = the number of units in the hidden layer - NOT including the bias unit
+% r = the number of output classifications
+
+% BACK PROPAGATION
+
+% NOTE
+% We've already computed the activations (z2, a2, z3, a3) for layers 2 and 3
+% so we'll reuse them for the backprop implementation.
+d3 = a3 - y_matrix;
+d2 = (Theta2(:, 2:end)' * d3')' .* sigmoidGradient(z2)';
+
+Delta1 = d2' * a1;
+Delta2 = d3' * a2;
+
+Theta1_grad = Delta1 .* (1/m);
+Theta2_grad = Delta2 .* (1/m);
+
+
 % Part 3: Implement regularization with the cost function and gradients.
 %
 %         Hint: You can implement this around the code for
@@ -98,19 +125,11 @@ J = (1/m) * sum(sum((-y_matrix .* log(a3)) - ((1 - y_matrix) .* log(1 - a3))));
 %               and Theta2_grad from Part 2.
 %
 
+Theta1(:, 1) = 0;
+Theta2(:, 1) = 0;
 
-
-
-
-
-
-
-
-
-
-
-
-
+Theta1_grad = Theta1_grad + (Theta1 * (lambda / m));
+Theta2_grad = Theta2_grad + (Theta2 * (lambda / m));
 
 
 % -------------------------------------------------------------
