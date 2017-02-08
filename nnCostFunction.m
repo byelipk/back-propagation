@@ -74,7 +74,7 @@ a3 = a3';
 % Unregularized cost
 J = (1/m) * sum(sum((-y_matrix .* log(a3)) - ((1 - y_matrix) .* log(1 - a3))));
 
-% Regularized cost - excluding the first two columns for the bias units
+% Regularized cost - exclude the first column of bias units
 J = J + (lambda / (2 * m)) * (
   sum(sum(Theta1(:, 2:end).^2)) +
   sum(sum(Theta2(:, 2:end).^2))
